@@ -8,9 +8,11 @@
 - DVC initialized with local cache dir and remote `minio` (s3://mlops-data @ http://localhost:9000); processed data DVC-tracked and pushed.
 - Extract run fetched 30 days of BTC history (101 rows) to data/raw/btc_history.csv. Transform produced data/processed/btc_processed.csv (97 rows) and data/report.html. Train run (local MLflow) achieved rmse≈2031.7, mae≈1647.1, r2≈0.152.
 - Python 3.12 env with core deps installed (dvc-s3, requests, pandas, fastapi, etc.); MLflow currently using local filesystem backend.
+- MLflow now points to DagsHub; training logs succeed on mlflow 2.13.1 (model registered as btc_predictor v1). Serving loads the model via env-driven MODEL_URI.
+- Processed data and report uploaded to DagsHub bucket (mlops-rps).
 
 # Near-Term Focus
-- Point MLflow to Dagshub (set MLFLOW_* env vars) and rerun training to log/register model there.
 - Hook Airflow DAG into Airflow instance and test end-to-end ETL/train.
-- Add serving/monitoring wiring once a registered model exists.
+- Wire serving in a container with MODEL_URI set to the registered model (e.g., models:/btc_predictor/1 or Production); expose metrics.
+- Add Prometheus/Grafana monitoring.
 - CI/CD setup after pipeline stabilizes.
