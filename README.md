@@ -60,6 +60,12 @@ AIRFLOW_HOME=$PWD/.airflow
    MODEL_URI="models:/btc_predictor/1" uvicorn src.serve:app --host 0.0.0.0 --port 8000
    # endpoints: /, /health, /predict, /metrics
    ```
+6) **Prometheus + Grafana (Docker)**  
+   ```
+   docker compose -f docker-compose.monitoring.yml up -d
+   # Prometheus: http://localhost:9090 (ensure prometheus.yml targets your service)
+   # Grafana: http://localhost:3000 (import grafana-dashboard.json, add Prometheus datasource)
+   ```
 
 ## Airflow (local)
 ```
@@ -80,6 +86,10 @@ Then log in at http://localhost:8080, enable `etl_dag`, trigger a run.
 docker build -t mlops-rps:latest .
 docker run -e MODEL_URI="models:/btc_predictor/1" -p 8000:8000 mlops-rps:latest
 ```
+
+## CI/CD
+- GitHub Actions workflow `.github/workflows/ci.yml` runs pytest with minimal deps (pandas, pytest) on push/PR.
+- Extend later with lint, full pipeline checks, and Docker publish as needed.
 
 ## DagsHub Integration
 - Git remote: `https://dagshub.com/<user>/<repo>.git`

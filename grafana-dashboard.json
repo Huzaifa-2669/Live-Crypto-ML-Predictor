@@ -1,0 +1,30 @@
+{
+  "title": "FastAPI Model Serving",
+  "timezone": "browser",
+  "panels": [
+    {
+      "type": "graph",
+      "title": "Requests Total",
+      "targets": [
+        { "expr": "requests_total", "legendFormat": "requests_total" }
+      ]
+    },
+    {
+      "type": "graph",
+      "title": "Inference Latency (p50/p90/p99)",
+      "targets": [
+        { "expr": "histogram_quantile(0.5, sum(rate(inference_latency_seconds_bucket[5m])) by (le))", "legendFormat": "p50" },
+        { "expr": "histogram_quantile(0.9, sum(rate(inference_latency_seconds_bucket[5m])) by (le))", "legendFormat": "p90" },
+        { "expr": "histogram_quantile(0.99, sum(rate(inference_latency_seconds_bucket[5m])) by (le))", "legendFormat": "p99" }
+      ]
+    },
+    {
+      "type": "graph",
+      "title": "Drift Ratio",
+      "targets": [
+        { "expr": "drift_ratio", "legendFormat": "drift_ratio" }
+      ]
+    }
+  ],
+  "schemaVersion": 16
+}
