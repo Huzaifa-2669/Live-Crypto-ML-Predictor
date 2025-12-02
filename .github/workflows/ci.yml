@@ -5,17 +5,53 @@ on:
   pull_request:
 
 jobs:
-  test:
+  lint-test:
     runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: ${{ github.workspace }}
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Install minimal deps
+      - name: Install deps (serve/etl minimal)
         run: |
           python -m pip install --upgrade pip
-          pip install pandas==2.2.3 pytest==8.3.3
+          pip install -r requirements.txt
+      - name: Lint (flake8)
+        run: pip install flake8==7.1.1 && flake8 src tests
       - name: Run tests
         run: pytest tests
+
+  build-serve:
+    runs-on: ubuntu-latest
+    needs: lint-test
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Docker image
+        run: docker build -t mlops-rps:ci .
+
+  # Placeholder for full pipeline check (mocked ETL/train)
+  pipeline-check:
+    runs-on: ubuntu-latest
+    needs: lint-test
+    env:
+      PYTHONPATH: ${{ github.workspace }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Dry-run ETL/train (skip network)
+        env:
+          LIVE_COIN_WATCH_API_KEY: dummy
+        run: |
+          python - <<'PY'
+          print("Placeholder: pipeline check - network-dependent steps skipped")
+          PY
