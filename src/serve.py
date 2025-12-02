@@ -1,11 +1,16 @@
 """FastAPI serving app with Prometheus metrics."""
+import os
 from fastapi import FastAPI
 import mlflow.pyfunc
 import numpy as np
 from prometheus_client import Counter, Histogram, make_asgi_app
 
 app = FastAPI()
-model = mlflow.pyfunc.load_model("models:/btc_predictor/Production")
+
+# Use env-driven model URI; default to a registry stage if not provided.
+DEFAULT_MODEL_URI = "models:/btc_predictor/Production"
+model_uri = os.environ.get("MODEL_URI", DEFAULT_MODEL_URI)
+model = mlflow.pyfunc.load_model(model_uri)
 
 requests_total = Counter("requests_total", "Total requests")
 inference_latency = Histogram("inference_latency_seconds", "Inference latency")
@@ -17,7 +22,20 @@ app.mount("/metrics", metrics_app)
 
 @app.get("/health")
 def health():
-    return {"status": "ok"}
+    return {"status": "ok", "model_uri": model_uri}
+
+
+@app.get("/")
+def root():
+    return {
+        "message": "BTC predictor service",
+        "endpoints": {
+            "health": "/health",
+            "predict": "/predict",
+            "metrics": "/metrics",
+        },
+        "model_uri": model_uri,
+    }
 
 
 @app.post("/predict")
