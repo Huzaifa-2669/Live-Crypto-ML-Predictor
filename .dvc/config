@@ -7,3 +7,5 @@
     endpointurl = http://localhost:9000
     access_key_id = admin
     secret_access_key = admin12345
+['remote "dagshub-remote"']
+    url = https://dagshub.com/i222669/mlops-rps.dvc

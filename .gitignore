@@ -7,3 +7,4 @@ data/raw/
 data/report.html
 mlruns/
 minio/
+airflow-venv/

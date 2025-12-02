@@ -52,13 +52,13 @@ def load_task(**context):
 with DAG(
     "etl_dag",
     default_args=default_args,
-    schedule_interval="@hourly",
+    schedule="@hourly",
     catchup=False,
 ) as dag:
     extract = PythonOperator(task_id="extract", python_callable=extract_task)
-    quality = PythonOperator(task_id="quality_check", python_callable=quality_task, provide_context=True)
-    transform = PythonOperator(task_id="transform", python_callable=transform_task, provide_context=True)
-    load_version = PythonOperator(task_id="load_version", python_callable=load_task, provide_context=True)
+    quality = PythonOperator(task_id="quality_check", python_callable=quality_task)
+    transform = PythonOperator(task_id="transform", python_callable=transform_task)
+    load_version = PythonOperator(task_id="load_version", python_callable=load_task)
     train = PythonOperator(task_id="train", python_callable=train_model)
 
     extract >> quality >> transform >> load_version >> train

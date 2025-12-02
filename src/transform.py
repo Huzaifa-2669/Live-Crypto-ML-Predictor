@@ -3,16 +3,19 @@ import logging
 from pathlib import Path
 import pandas as pd
 
-# Support both ydata-profiling (new) and pandas-profiling (legacy)
-try:
-    from ydata_profiling import ProfileReport  # preferred
-except ImportError:
-    from pandas_profiling import ProfileReport  # fallback
-
 logger = logging.getLogger(__name__)
 
 
 def transform_data(df: pd.DataFrame) -> pd.DataFrame:
+    # Lazy import profiling to avoid expensive imports at DAG parse time
+    try:
+        from ydata_profiling import ProfileReport  # type: ignore
+    except Exception:
+        try:
+            from pandas_profiling import ProfileReport  # type: ignore
+        except Exception as exc:
+            raise ImportError("ydata_profiling or pandas_profiling is required") from exc
+
     df = df.dropna()
     df["date"] = pd.to_datetime(df["date"], unit="ms")
     df["lag_1"] = df["rate"].shift(1)

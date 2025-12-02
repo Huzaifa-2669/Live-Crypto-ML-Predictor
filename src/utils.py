@@ -1,6 +1,8 @@
 """Utility functions for ETL quality checks and data versioning."""
 import logging
 import os
+import shutil
+import subprocess
 from pathlib import Path
 import pandas as pd
 from typing import Any, Dict
@@ -38,8 +40,9 @@ def load_and_version(processed_path: str, remote_path: str = "btc_processed.csv"
     client.fput_object(bucket, remote_path, str(processed))
     logger.info("Uploaded %s to bucket %s as %s", processed, bucket, remote_path)
     # DVC add/push
-    os.system(f'dvc add {processed}')
-    os.system('dvc push')
+    dvc_bin = os.getenv("DVC_BIN") or shutil.which("dvc") or "./venv/bin/dvc"
+    subprocess.run([dvc_bin, "add", str(processed)], check=True)
+    subprocess.run([dvc_bin, "push"], check=True)
     logger.info("DVC add/push completed for %s", processed)
 
 

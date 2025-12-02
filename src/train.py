@@ -2,15 +2,17 @@
 import logging
 import os
 import pandas as pd
-import mlflow
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
-from sklearn.ensemble import RandomForestRegressor
 
 logger = logging.getLogger(__name__)
 
 
 def train_model() -> None:
+    # Lazy imports to keep DAG parse time fast
+    import mlflow
+    from sklearn.model_selection import train_test_split
+    from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
+    from sklearn.ensemble import RandomForestRegressor
+
     # Pull latest data via DVC
     os.system("dvc pull")
     df = pd.read_csv("data/processed/btc_processed.csv")
