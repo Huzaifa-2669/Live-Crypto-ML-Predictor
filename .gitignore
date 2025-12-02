@@ -1,0 +1,9 @@
+venv/
+.cache/
+__pycache__/
+*.pyc
+.env.minio
+data/raw/
+data/report.html
+mlruns/
+minio/
